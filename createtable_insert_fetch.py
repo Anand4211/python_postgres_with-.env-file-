@@ -5,7 +5,7 @@ try:
     db_connection = psycopg2.connect(
         user="postgres",
         password="postgres",
-        host="172.17.0.6",
+        host="172.17.",
         port="5432",
         database="postgres",
     )
@@ -14,6 +14,7 @@ try:
     create_t = """ drop table if exists employee_data """
     cursor.execute(create_t)
     db_connection.commit()
+
     create_table1 = """create table  employee_data (e_id int, e_name varchar(20)  ,salary int ,
     dob date); """
     cursor.execute(create_table1)

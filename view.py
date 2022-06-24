@@ -4,7 +4,7 @@ try:
     connection = psycopg2.connect(user='postgres',
                                   password='postgres',
                                   port='5432',
-                                  host='172.17.0.6',
+                                  host='172.17..6',
                                   database='postgres')
 
     cursor = connection.cursor()

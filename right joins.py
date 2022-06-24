@@ -5,7 +5,7 @@ try:
         user="postgres",
         password="postgres",
         port="5432",
-        host="172.17.0.6",
+        host="172.17.0",
         database="postgres",
     )
 

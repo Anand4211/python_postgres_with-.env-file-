@@ -1,3 +1,4 @@
+# python postgresql trigger
 import psycopg2
 
 try:
@@ -5,7 +6,7 @@ try:
     connection = psycopg2.connect(
         user="postgres",
         password="postgres",
-        host="172.17.0.6",
+        host="172.17.",
         port="5432",
         database="postgres",
     )
@@ -14,9 +15,11 @@ try:
     create_t = """ drop table if exists client1 """
     cursor.execute(create_t)
     connection.commit()
+
     create_t2 = """ drop table if exists client2 """
     cursor.execute(create_t2)
     connection.commit()
+
     create_table1 = """create table client1 (id int primary key,client_name varchar(30),client_address varchar(20))"""
     cursor.execute(create_table1)
     connection.commit()
@@ -28,6 +31,7 @@ try:
     connection.commit()
     print("client2 table created")
 
+    # create function for triggers
     cursor.execute(
         """CREATE OR REPLACE FUNCTION log_backup_data()  
   RETURNS TRIGGER   
@@ -45,6 +49,8 @@ $$  """
     )
     connection.commit()
     print("function created")
+
+    # craete trigger and execute
 
     cursor.execute(
         """create trigger backup_data
