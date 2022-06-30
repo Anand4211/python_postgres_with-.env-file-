@@ -1,12 +1,21 @@
+import logging
 import psycopg2
+from psycopg2.extras import LoggingConnection
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("logger information")
 
 try:
-    connection = psycopg2.connect(user='postgres',
-                                  password='postgres',
-                                  port='5432',
-                                  host='172.17..6',
-                                  database='postgres')
 
+    connection = psycopg2.connect(
+        connection_factory=LoggingConnection,
+        user="postgres",
+        password="postgres",
+        host="172.17.0.6",
+        port="5432",
+        database="postgres",
+    )
+    connection.initialize(logger)
     cursor = connection.cursor()
 
     create_t2 = """ drop table if exists employeew """
@@ -16,7 +25,8 @@ try:
     cursor.execute(create_t2)
     connection.commit()
 
-    create_table1 = """create table employeew(id int primary key,employee_name varchar(30),employee_address varchar(20))"""
+    create_table1 = """create table employeew(id int primary key,employee_name varchar(30),
+    employee_address varchar(20))"""
     cursor.execute(create_table1)
     connection.commit()
     print("employee1 table created")
@@ -31,7 +41,8 @@ try:
     cursor.execute(insert_data)
     connection.commit()
     print("employee1 data inserted")
-    insert_data = """insert into salary(id, salary,technology) values (2,100000,'dotnet'),(3,120000,'python'),(4,2000000,'python,java,sql') """
+    insert_data = """insert into salary(id, salary,technology) values (2,100000,'dotnet'),(3,120000,'python'),
+    (4,2000000,'python,java,sql') """
     cursor.execute(insert_data)
     connection.commit()
     print("employee data inserted")

@@ -7,21 +7,19 @@ logger = logging.getLogger("logger information")
 
 try:
 
-    connection = psycopg2.connect(
-        connection_factory=LoggingConnection,
-        user="postgres",
-        password="postgres",
-        host="172.17.0.6",
-        port="5432",
-        database="postgres",
-    )
+    connection = psycopg2.connect(connection_factory=LoggingConnection,
+                                  user="postgres",
+                                  password="postgres",
+                                  host="172.17.0.6",
+                                  port="5432",
+                                  database="postgres",
+                                  )
     connection.initialize(logger)
     cursor = connection.cursor()
 
     create_t2 = """ drop table if exists employee3"""
     cursor.execute(create_t2)
     connection.commit()
-
     create_t2 = """ drop table if exists salary1 """
     cursor.execute(create_t2)
     connection.commit()
@@ -50,18 +48,12 @@ try:
     connection.commit()
     logging.info("employee data inserted")
 
-    left_joins = """select  employee3.employee_name,salary1.salary from employee3  full  join salary1  on 
-    employee3.id =salary1.id  """
-    cursor.execute(left_joins)
-    connection.commit()
-    logging.info(cursor.fetchall())
-
-    right_joins = """select  employee3.employee_name,salary1.salary from employee3  right join salary1  on 
-    employee3.id =salary1.id; """
-    cursor.execute(right_joins)
+    full_joins = """select  employee3.employee_name,salary1.salary from employee3  full join salary1  on employee3.id 
+    =salary1.id; """
+    cursor.execute(full_joins)
     connection.commit()
     logging.info(cursor.fetchall())
 
 
 except (Exception, psycopg2.Error) as Error:
-    logging.info("error while inserted")
+    print("error while inserted")

@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import LoggingConnection
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("logger information")
+logger = logging.getLogger("loggerinformation")
 
 try:
 
@@ -16,25 +16,26 @@ try:
         database="postgres",
     )
     connection.initialize(logger)
-
     cursor = connection.cursor()
-    create_t = """ drop table if exists employee_data """
-    cursor.execute(create_t)
+
+    cursor.execute("""drop table if exists people""")
     connection.commit()
 
-    create_table1 = """create table  employee_data (e_id int, e_name varchar(20)  ,salary int ,
-    dob date); """
+    create_table1 = """create table people(people_name varchar(30),people_age int)"""
     cursor.execute(create_table1)
     connection.commit()
-    print("Table created")
-    cursor.execute("""select e_id from employee_data;""")
+    logging.info("people table created")
+
+    insert_data = """insert into people( people_name, people_age) values ('deepaks',39),('rohit',45),('rahul',44) """
+    cursor.execute(insert_data)
+    connection.commit()
+    logging.info("car data inserted")
+
+    cursor.execute(
+        """select people_name ,people_age from people  where people_name like '%_s' """
+    )
     logging.info(cursor.fetchall())
 
 
 except (Exception, psycopg2.Error) as error:
     print("Error in create operation", error)
-
-finally:
-    # closing database connection.
-    connection.close()
-    logging.info('connection is closed')
