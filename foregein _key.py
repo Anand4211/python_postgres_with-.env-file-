@@ -1,58 +1,64 @@
-import logging
 import psycopg2
+import logging
+from config import config
+
 from psycopg2.extras import LoggingConnection
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("logger information")
 
-try:
 
-    connection = psycopg2.connect(
-        connection_factory=LoggingConnection,
-        user="postgres",
-        password="postgres",
-        host="172.17.0.6",
-        port="5432",
-        database="postgres",
-    )
-    connection.initialize(logger)
-    cursor = connection.cursor()
+def connect():
+    """ Connect to the PostgreSQL database server """
 
-    drop_table = '''drop table if exists product cascade'''
-    cursor.execute(drop_table)
+    try:
+        # read connection parameters
+        params = config()
 
-    drop_table1 = '''drop table if exists supplier cascade'''
-    cursor.execute(drop_table1)
+        # connect to the PostgreSQL server
+        logging.info('Connecting to the PostgreSQL database...')
+        connection = psycopg2.connect(connection_factory=LoggingConnection, **params)
+        connection.initialize(logger)
 
-    create_table = '''create table supplier (supplier_id int primary key ,supplier_name varchar(19))'''
-    cursor.execute(create_table)
-    connection.commit()
+        cursor = connection.cursor()
+        drop_table = '''drop table if exists product cascade'''
+        cursor.execute(drop_table)
 
-    create_table1 = '''create table product (product_id int primary key ,product_name varchar(15),supplier_id int, 
-    foreign key(supplier_id) references supplier (supplier_id) on delete set null)'''
-    cursor.execute(create_table1)
-    connection.commit()
+        drop_table1 = '''drop table if exists supplier cascade'''
+        cursor.execute(drop_table1)
 
-    insertion = '''insert into supplier values( 1,'rakesh'),(4,'prakash'),(6,'raja'),(9,'colliery')'''
-    cursor.execute(insertion)
-    connection.commit()
+        create_table = '''create table supplier (supplier_id int primary key ,supplier_name varchar(19))'''
+        cursor.execute(create_table)
+        connection.commit()
 
-    insertion_product = '''insert into product values (1,'water',1),(2,'oil',null),(3,'water',1),(4,'laptop',9)'''
-    cursor.execute(insertion_product)
-    connection.commit()
+        create_table1 = '''create table product (product_id int primary key ,product_name varchar(15),supplier_id int, 
+        foreign key(supplier_id) references supplier (supplier_id) on delete set null)'''
+        cursor.execute(create_table1)
+        connection.commit()
 
-    cursor.execute("""select * from supplier""")
-    logging.info(cursor.fetchall())
+        insertion = '''insert into supplier values( 1,'rakesh'),(4,'prakash'),(6,'raja'),(9,'colliery')'''
+        cursor.execute(insertion)
+        connection.commit()
 
-    cursor.execute("""select * from product""")
-    logging.info(cursor.fetchall())
+        insertion_product = '''insert into product values (1,'water',1),(2,'oil',null),(3,'water',1),(4,'laptop',9)'''
+        cursor.execute(insertion_product)
+        connection.commit()
 
-    cursor.execute('''delete from supplier where supplier_id = 9''')
-    logging.info('deleeted')
+        cursor.execute("""select * from supplier""")
+        logging.info(cursor.fetchall())
 
-    cursor.execute('''select * from product''')
-    logging.info(cursor.fetchall())
+        cursor.execute("""select * from product""")
+        logging.info(cursor.fetchall())
+
+        cursor.execute('''delete from supplier where supplier_id = 9''')
+        logging.info('deleeted')
+
+        cursor.execute('''select * from product''')
+        logging.info(cursor.fetchall())
+
+    except (Exception, psycopg2.Error) as error:
+        print(error)
 
 
-except (Exception, psycopg2.Error) as error:
-    print(error)
+if __name__ == "__main__":
+    connect()

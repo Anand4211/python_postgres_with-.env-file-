@@ -1,70 +1,78 @@
-import logging
 import psycopg2
+import logging
+from config import config
+
 from psycopg2.extras import LoggingConnection
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("logger information")
 
-try:
 
-    connection = psycopg2.connect(
-        connection_factory=LoggingConnection,
-        user="postgres",
-        password="postgres",
-        host="172.17.0.6",
-        port="5432",
-        database="postgres",
-    )
-    connection.initialize(logger)
-    cursor = connection.cursor()
-    create_t2 = """ drop table if exists bank """
-    cursor.execute(create_t2)
-    connection.commit()
+def connect():
+    """ Connect to the PostgreSQL database server """
 
-    create_table = (
-        """create table bank (id int, name varchar(12),balance numeric(7,2) )"""
-    )
-    cursor.execute(create_table)
-    connection.commit()
-    logging.info("bank table created")
+    try:
+        # read connection parameters
+        params = config()
 
-    insert_data = """insert into bank(id,name,balance) values(1,'adnan',40000.9),(2,'arman',8787.8) """
-    cursor.execute(insert_data)
-    connection.commit()
-    logging.info("bank data inserted")
+        # connect to the PostgreSQL server
+        logging.info('Connecting to the PostgreSQL database...')
+        connection = psycopg2.connect(connection_factory=LoggingConnection, **params)
+        connection.initialize(logger)
 
-    procedure = """create procedure money_transfer4(sender int ,receiver int ,amount numeric)
-       as 
-    $$  
-       begin
-          
-           update bank set balance = balance-amount
-           where id =sender;
-           
-           update bank set balance = balance+amount
-           where id =receiver;
-           
-        
-       end;
-     
-    $$ language plpgsql"""
+        cursor = connection.cursor()
+        create_t2 = """ drop table if exists bank """
+        cursor.execute(create_t2)
+        connection.commit()
 
-    # cursor.execute(procedure)
-    # connection.commit()
+        create_table = (
+            """create table bank (id int, name varchar(12),balance numeric(7,2) )"""
+        )
+        cursor.execute(create_table)
+        connection.commit()
+        logging.info("bank table created")
 
-    cursor.execute("call money_transfer4(1,2,3000)")
+        insert_data = """insert into bank(id,name,balance) values(1,'adnan',40000.9),(2,'arman',8787.8) """
+        cursor.execute(insert_data)
+        connection.commit()
+        logging.info("bank data inserted")
 
-    connection.commit()
+        procedure = """create procedure money_transfer4(sender int ,receiver int ,amount numeric)
+           as 
+        $$  
+           begin
+              
+               update bank set balance = balance-amount
+               where id =sender;
+               
+               update bank set balance = balance+amount
+               where id =receiver;
+               
+            
+           end;
+         
+        $$ language plpgsql"""
 
-    cursor.execute("select * from bank")
-    logging.info(cursor.fetchall())
+        # cursor.execute(procedure)
+        # connection.commit()
 
-    cursor.execute("call money_transfer4(1,2,3000)")
+        cursor.execute("call money_transfer4(1,2,3000)")
 
-    connection.commit()
+        connection.commit()
 
-    cursor.execute("select * from bank")
-    logging.info(cursor.fetchall())
+        cursor.execute("select * from bank")
+        logging.info(cursor.fetchall())
 
-except (Exception, psycopg2.Error) as error:
-    print("Error in create operation", error)
+        cursor.execute("call money_transfer4(1,2,3000)")
+
+        connection.commit()
+
+        cursor.execute("select * from bank")
+        logging.info(cursor.fetchall())
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error in create operation", error)
+
+
+if __name__ == "__main__":
+    connect()
